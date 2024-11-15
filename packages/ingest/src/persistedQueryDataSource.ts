@@ -5,11 +5,17 @@ import { parse as parseYaml } from "yaml";
 import { DataSource } from "mongodb-rag-ingest/sources";
 import { MongoClient, Page } from "mongodb-rag-core";
 import { loadEnvVars } from "./loadEnvVars";
+import { Client } from "pg";
 
 // Load project environment variables
 const dotenvPath = path.join(__dirname, "..", "..", "..", ".env"); // .env at project root
-const { MONGODB_CONNECTION_URI, MONGODB_DATABASE_NAME } =
-  loadEnvVars(dotenvPath);
+const {
+  MONGODB_CONNECTION_URI,
+  MONGODB_DATABASE_NAME,
+  PG_CONNECTION_URI,
+  PG_DATABASE_NAME,
+  PG_VECTOR_TABLE_NAME,
+} = loadEnvVars(dotenvPath);
 
 interface ManifestOperation {
   id: string;
@@ -69,23 +75,32 @@ export async function persistedQueryDataSource(): Promise<DataSource> {
       //We drop conversations so we're not storing a lot of data
       if (pages.length == 0) {
         console.log("No operations found, resetting embeddings");
-        const client = new MongoClient(MONGODB_CONNECTION_URI);
-        await client.connect();
-        await client
-          .db(MONGODB_DATABASE_NAME)
-          .collection("embedded_content")
-          .deleteMany({});
-        await client
-          .db(MONGODB_DATABASE_NAME)
-          .collection("pages")
-          .deleteMany({});
+        if (PG_CONNECTION_URI && PG_DATABASE_NAME && PG_VECTOR_TABLE_NAME) {
+          const client = new Client({
+            connectionString: PG_CONNECTION_URI,
+          });
+          await client.connect();
+          await client.query(`DELETE FROM ${PG_VECTOR_TABLE_NAME}`);
+          await client.end();
+        } else {
+          const client = new MongoClient(MONGODB_CONNECTION_URI);
+          await client.connect();
           await client
-          .db(MONGODB_DATABASE_NAME)
-          .collection("conversations")
-          .deleteMany({});
-        await client.close();
+            .db(MONGODB_DATABASE_NAME)
+            .collection("embedded_content")
+            .deleteMany({});
+          await client
+            .db(MONGODB_DATABASE_NAME)
+            .collection("pages")
+            .deleteMany({});
+          await client
+            .db(MONGODB_DATABASE_NAME)
+            .collection("conversations")
+            .deleteMany({});
+          await client.close();
+        }
       }
-      
+
       return pages;
     },
   };
