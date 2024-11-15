@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mongodb-rag-ingest": "^0.1.8"
+    "mongodb-rag-ingest": "^0.1.8",
+    "pg": "^8.13.1",
+    "pgvector": "^0.2.0"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
