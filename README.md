@@ -14,6 +14,8 @@ Read our [guide](https://www.apollographql.com/guides/chatbots) on getting start
 - [npm](https://www.npmjs.com/get-npm) (comes with Node.js)
 - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) account
 - [OpenAI API key](https://platform.openai.com/api-keys)
+- [PostgreSQL](https://www.postgresql.org/download/) (if using PostgreSQL as the vector store)
+- [pgvector extension](https://github.com/pgvector/pgvector) for PostgreSQL
 
 ### Installing the project
 
@@ -65,6 +67,31 @@ MONGODB_DATABASE_NAME="keynote"
 VECTOR_SEARCH_INDEX_NAME="vector_index"
 ```
 
+### Setting up a PostgreSQL vector store with pgvector
+
+Instructions for setting up PostgreSQL with the pgvector extension can be found in the [pgvector documentation](https://github.com/pgvector/pgvector). In summary, you'll need to:
+
+1. Install PostgreSQL
+2. Install the pgvector extension
+3. Create a database
+4. Create a table with a vector column
+
+```sql
+CREATE TABLE vector_table (
+  id SERIAL PRIMARY KEY,
+  embedding VECTOR(1536)
+);
+```
+
+5. Add the connection information to your `.env` file
+
+```
+# PostgreSQL config
+PG_CONNECTION_URI="postgresql://{user}:{password}@{host}:{port}/{database}"
+PG_DATABASE_NAME="keynote"
+PG_VECTOR_TABLE_NAME="vector_table"
+```
+
 ### Setting up GraphOS
 
 To try the chatbot dev kit, we’ll create a new graph in GraphOS that we can
@@ -91,7 +118,7 @@ Run the following commands:
 npm run pq:manifest 
 # Publish manifest for graph router to use
 npm run pq:publish
-# Vectorize /graph/operations folder and push to Mongo Atlas
+# Vectorize /graph/operations folder and push to Mongo Atlas or PostgreSQL
 npm run pq:ingest
 # Start your graph router locally
 npm run pq:router
@@ -101,13 +128,13 @@ npm run dev
 
 ## Using the project
 
-### Ingesting data into MongoDB
+### Ingesting data into MongoDB or PostgreSQL
 
 ```bash
 # (Re)generate all the graph/operation-manifest.json files
 npm run pq:manifest
 
-# Ingest all the graph/operation-manifest.json files into MongoDB Atlas
+# Ingest all the graph/operation-manifest.json files into MongoDB Atlas or PostgreSQL
 npm run pq:ingest
 ```
 

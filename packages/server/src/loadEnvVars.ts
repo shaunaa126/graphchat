@@ -15,6 +15,9 @@ export function loadEnvVars(path: string) {
     OPENAI_API_KEY,
     OPENAI_EMBEDDING_MODEL,
     OPENAI_CHAT_COMPLETION_MODEL,
+    PG_CONNECTION_URI,
+    PG_DATABASE_NAME,
+    PG_VECTOR_TABLE_NAME,
   } = process.env;
   assert(MONGODB_CONNECTION_URI, "MONGODB_CONNECTION_URI is required");
   assert(MONGODB_DATABASE_NAME, "MONGODB_DATABASE_NAME is required");
@@ -25,6 +28,9 @@ export function loadEnvVars(path: string) {
     OPENAI_CHAT_COMPLETION_MODEL,
     "OPENAI_CHAT_COMPLETION_MODEL is required"
   );
+  assert(PG_CONNECTION_URI, "PG_CONNECTION_URI is required");
+  assert(PG_DATABASE_NAME, "PG_DATABASE_NAME is required");
+  assert(PG_VECTOR_TABLE_NAME, "PG_VECTOR_TABLE_NAME is required");
   return {
     MONGODB_CONNECTION_URI,
     MONGODB_DATABASE_NAME,
@@ -32,5 +38,8 @@ export function loadEnvVars(path: string) {
     OPENAI_API_KEY,
     OPENAI_EMBEDDING_MODEL,
     OPENAI_CHAT_COMPLETION_MODEL,
+    PG_CONNECTION_URI,
+    PG_DATABASE_NAME,
+    PG_VECTOR_TABLE_NAME,
   };
 }
